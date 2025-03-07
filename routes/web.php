@@ -14,6 +14,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GuestMessageController;
 use App\Http\Controllers\TestimonialController;
+use App\Http\Controllers\Admin\RiderManagementController;
+
 
 
 
@@ -48,7 +50,7 @@ Route::middleware('guest')->group(function () {
     })->name('package');
 
     Route::get('/contact-us', function () {
-        return view('contact');
+        return view('home.contact-us');
     })->name('contact');
 
     Route::get('/book-ride', function () {
@@ -116,6 +118,7 @@ Route::group(['middleware' => 'auth'], function() {
     });
 
 
+});    
     Route::group(['middleware' => 'driver'], function() {
       
         Route::prefix('driver')->group(function () {
@@ -151,42 +154,50 @@ Route::group(['middleware' => 'auth'], function() {
                 Route::delete('/dashboard/{vehicle}', [VehicleController::class, 'destroy'])
                     ->name('vehicle.destroy');
 
+                  
+        
+
             });
         });
     });
 
 
-    Route::group(['middleware' => 'admin'], function() {
+    Route::group(['middleware' => 'admin'], function () {
         Route::prefix('admin')->group(function () {
             Route::name('admin.')->group(function () {
-
+    
                 Route::get('/dashboard', [AdminDashboardRendererController::class, 'dashboardRenderer'])
                     ->name('dashboard');
-
-                    // Edit Profile
-                Route::get('/edit-profile', function () {
-                    return view('admin.edit-profile'); })
-                    ->name('edit-profile.edit');
     
-                //view upload page
+                // Edit Profile
+                Route::get('/edit-profile', function () {
+                    return view('admin.edit-profile');
+                })->name('edit-profile.edit');
+    
+                // View upload page
                 Route::patch('/edit-profile', [ProfileController::class, 'update'])
                     ->name('edit-profile.update');
-
-                //change password:view
+    
+                // Change password: view
                 Route::get('/change-password', function () {
-                    return view('admin.change-password'); })
-                    ->name('change-password.edit');
-
-                //update password page
+                    return view('admin.change-password');
+                })->name('change-password.edit');
+    
+                // Update password
                 Route::patch('/change-password', [ChangePasswordController::class, 'updatePassword'])
                     ->name('change-password.update');
+    
+                // Rider management routes
+                Route::get('/riders', [RiderManagementController::class, 'index'])->name('riders');
+                Route::post('/riders/{rider}/status', [RiderManagementController::class, 'updateStatus'])->name('riders.status');
+                Route::get('/riders/{rider}/rides', [RiderManagementController::class, 'showRides'])->name('riders.rides');
+    
+            }); // ✅ This properly closes Route::name('admin.')
+        }); // ✅ This properly closes Route::prefix('admin')
+    }); // ✅ This properly closes Route::group(['middleware' => 'admin'])
+    
 
-            });
-        });
-    });
 
-
-});
 
 
 Route::middleware([

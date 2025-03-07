@@ -14,6 +14,8 @@ class Rider extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'user_id',  // Gerard add in Tinker
+        'status', 
         'vehicle',
         'payment',
         'pick_up',
